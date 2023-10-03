@@ -9,7 +9,7 @@ const cachedNames = {};
 function updateMention(aMention, username, name) {
   if (name) {
     aMention.dataset.username = username;
-    aMention.innerText = `@${name}`;
+    aMention.innerText = `${name} (${username})`;
     aMention.classList.add("mention-fullname");
   }
 }
@@ -19,7 +19,7 @@ export default apiInitializer("0.8", (api) => {
 
   api.decorateCookedElement(
     (element) => {
-      const mentions = element.querySelectorAll("a.mention");
+      const mentions = element.querySelectorAll("a.mention,a.mention-group");
 
       mentions.forEach((aMention) => {
         if (aMention.dataset.username) {
@@ -28,6 +28,11 @@ export default apiInitializer("0.8", (api) => {
         }
 
         const username = aMention.innerText;
+
+        if (aMention.hasAttribute("data-full-name")) {
+          updateMention(aMention, username, aMention.dataset.fullName);
+          return;
+        }
 
         const cachedName = cachedNames[username];
         if (cachedName) {
